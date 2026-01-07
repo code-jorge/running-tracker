@@ -23,18 +23,14 @@ const GoalForm = ({ currentMonth, onSave, onCancel, initialGoal = 0 }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
-        // Simulate network delay for better UX or just call directly
-        // await new Promise(r => setTimeout(r, 500)); 
-
-        onSave(target);
+        await onSave(target);
         setLoading(false);
     };
 
     return (
         <Card>
             <h3 className={styles.header}>
-                <FaTrophy style={{ color: 'var(--primary)' }} /> {isEditing ? 'Edit Monthly Goal' : 'Set Monthly Goal'}
+                <FaTrophy className={styles.headerIcon} /> {isEditing ? 'Edit Monthly Goal' : 'Set Monthly Goal'}
             </h3>
             <p className={styles.description}>
                 {isEditing

@@ -61,7 +61,7 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
     return (
         <Card>
             <h3 className={styles.header}>
-                <FaRunning style={{ color: 'var(--accent)' }} /> {isEditing ? 'Edit Run' : 'Log Run'}
+                <FaRunning className={styles.headerIcon} /> {isEditing ? 'Edit Run' : 'Log Run'}
             </h3>
             <form onSubmit={handleSubmit}>
                 <Input

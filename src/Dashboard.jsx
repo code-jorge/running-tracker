@@ -119,7 +119,7 @@ const Dashboard = () => {
         <div className={styles.wrapper}>
             <header className={styles.header}>
                 <Button variant="secondary" onClick={handlePrevMonth} className={styles.navButton}><FaChevronLeft /></Button>
-                <div style={{ textAlign: 'center' }}>
+                <div className={styles.headerCenter}>
                     <h1 className={styles.headerTitle}>{monthName}</h1>
                 </div>
                 <Button variant="secondary" onClick={handleNextMonth} className={styles.navButton}><FaChevronRight /></Button>

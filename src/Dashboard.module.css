@@ -21,6 +21,10 @@
     margin: 0;
 }
 
+.headerCenter {
+    text-align: center;
+}
+
 .navButton {
     width: 40px;
     height: 40px;
