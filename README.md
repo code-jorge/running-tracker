@@ -1,5 +1,7 @@
 # Running Tracker
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/f904a96c-6db7-43cf-b352-fd792e36e53e/deploy-status)](https://app.netlify.com/projects/jorge-running/deploys)
+
 A modern, serverless running tracker built with React and Netlify. This application allows users to set monthly running goals, log their activities, and visualize their progress with a premium, glassmorphism-inspired UI.
 
 ## Features
