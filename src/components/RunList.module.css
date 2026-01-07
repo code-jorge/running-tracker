@@ -1,0 +1,56 @@
+.header {
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.empty {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 20px;
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.item {
+    display: flex;
+    justify-content: space-between;
+    padding: 15px;
+    background: var(--surface-dim);
+    border-radius: 12px;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.clickable:hover {
+    background: var(--surface-hover);
+}
+
+.date {
+    font-weight: 500;
+}
+
+.day {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.distance {
+    font-weight: bold;
+    font-size: 1.2rem;
+    color: var(--accent);
+}
+
+.unit {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}

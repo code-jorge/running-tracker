@@ -1,0 +1,42 @@
+.button {
+    padding: 12px 24px;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    cursor: pointer;
+    outline: none;
+}
+
+.button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.primary {
+    background: var(--gradient-primary);
+    color: var(--text-color);
+}
+
+.secondary {
+    background: var(--gradient-blue);
+    color: var(--text-color);
+    box-shadow: var(--shadow-blue);
+}
+
+.accent {
+    background: var(--gradient-accent);
+    color: #000;
+}
+
+.danger {
+    background: var(--gradient-danger);
+    color: var(--text-color);
+    box-shadow: var(--shadow-danger);
+}

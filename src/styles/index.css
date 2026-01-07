@@ -1,0 +1,81 @@
+:root {
+  --bg-color: #0d0d12;
+  --text-color: #ffffff;
+  --text-muted: #8b8b93;
+  --primary: #bb86fc;
+  /* Light purple */
+  --primary-glow: rgba(187, 134, 252, 0.4);
+  --accent: #03dac6;
+  /* Teal */
+  --accent-glow: rgba(3, 218, 198, 0.4);
+  --glass-bg: rgba(255, 255, 255, 0.05);
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --card-radius: 20px;
+  /* Surfaces */
+  --surface-dim: rgba(255, 255, 255, 0.03);
+  --surface-hover: rgba(255, 255, 255, 0.08);
+  --surface-highlight: rgba(255, 255, 255, 0.15);
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+
+  /* Borders */
+  --border-medium: rgba(255, 255, 255, 0.3);
+
+  /* Status */
+  --success-color: #4ade80;
+  --warning-color: #fbbf24;
+  --danger-color: #ef4444;
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--primary) 0%, #9f62ea 100%);
+  --gradient-accent: linear-gradient(135deg, var(--accent) 0%, #00b3a1 100%);
+  --gradient-blue: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+  --gradient-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  --gradient-progress: linear-gradient(90deg, var(--accent) 0%, #a855f7 100%);
+
+  /* Shadows */
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --shadow-blue: 0 4px 15px rgba(59, 130, 246, 0.4);
+  --shadow-danger: 0 4px 15px rgba(239, 68, 68, 0.4);
+
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(29, 29, 65, 0.7) 0%, transparent 20%),
+    radial-gradient(circle at 90% 80%, rgba(35, 25, 60, 0.7) 0%, transparent 20%);
+}
+
+#root {
+  max-width: 480px;
+  /* Mobile first / centered app */
+  margin: 0 auto;
+  padding: 20px;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+input {
+  font-family: inherit;
+}
