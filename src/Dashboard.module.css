@@ -57,10 +57,10 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
 }
 
-.sportSection {
+.sportRow {
     width: 100%;
     text-align: center;
 }
@@ -83,6 +83,37 @@
 .percentageIcon {
     font-size: 2.4rem;
     color: var(--accent);
+}
+
+.percentageRow {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.percentageBox {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px 8px;
+    background: var(--surface-dim);
+    border-radius: 12px;
+    min-width: 0;
+}
+
+.boxIcon {
+    font-size: 1.5rem;
+    color: var(--accent);
+    flex-shrink: 0;
+}
+
+.boxPercent {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--accent);
+    line-height: 1;
 }
 
 .statsBox {

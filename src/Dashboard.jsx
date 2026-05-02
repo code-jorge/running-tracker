@@ -113,29 +113,51 @@ const Dashboard = () => {
         return <div className={styles.loading}>Loading...</div>;
     }
 
-    const renderSportProgress = (key) => {
-        const sport = SPORTS[key];
-        const Icon = sport.icon;
+    const sportStats = (key) => {
         const goal = data.goal[key] || 0;
         const total = totals[key] || 0;
-        const percent = goal > 0 ? (total / goal) * 100 : 0;
-        const expectedKm = (expectedProgress / 100) * goal;
-        const isAhead = total >= goal || total >= expectedKm;
+        return {
+            goal,
+            total,
+            percent: goal > 0 ? (total / goal) * 100 : 0,
+            expectedKm: (expectedProgress / 100) * goal,
+        };
+    };
 
+    const renderSportHeader = (key) => {
+        const sport = SPORTS[key];
+        const Icon = sport.icon;
+        const { percent } = sportStats(key);
         return (
-            <div key={key} className={styles.sportSection}>
-                <div className={styles.percentageWrapper}>
-                    <Icon className={styles.percentageIcon} aria-label={sport.label} />
-                    <span className={styles.percentageText}>
-                        {Math.round(percent)}%
-                    </span>
-                </div>
+            <div key={key} className={styles.percentageWrapper}>
+                <Icon className={styles.percentageIcon} aria-label={sport.label} />
+                <span className={styles.percentageText}>{Math.round(percent)}%</span>
+            </div>
+        );
+    };
 
+    const renderSportBox = (key) => {
+        const sport = SPORTS[key];
+        const Icon = sport.icon;
+        const { percent } = sportStats(key);
+        return (
+            <div key={key} className={styles.percentageBox}>
+                <Icon className={styles.boxIcon} aria-label={sport.label} />
+                <span className={styles.boxPercent}>{Math.round(percent)}%</span>
+            </div>
+        );
+    };
+
+    const renderSportRow = (key) => {
+        const sport = SPORTS[key];
+        const { goal, total, percent, expectedKm } = sportStats(key);
+        const isAhead = total >= goal || total >= expectedKm;
+        return (
+            <div key={key} className={styles.sportRow}>
                 <ProgressBar progress={percent} expected={expectedProgress} goal={goal} />
-
                 <div className={styles.statsBox}>
                     <div className={styles.statsLeft}>
-                        <div className={styles.label}>Progress</div>
+                        <div className={styles.label}>{sport.gerund} progress</div>
                         <div className={styles.value}>
                             {total.toFixed(1)} <span className={styles.subValue}>/ {goal} km</span>
                         </div>
@@ -172,7 +194,14 @@ const Dashboard = () => {
                 <Card className={styles.progressCard}>
                     {hasAnyGoal ? (
                         <div className={styles.percentageContainer}>
-                            {activeSports.map(renderSportProgress)}
+                            {activeSports.length > 1 ? (
+                                <div className={styles.percentageRow}>
+                                    {activeSports.map(renderSportBox)}
+                                </div>
+                            ) : (
+                                activeSports.map(renderSportHeader)
+                            )}
+                            {activeSports.map(renderSportRow)}
                         </div>
                     ) : (
                         <div className={styles.emptyState}>

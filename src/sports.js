@@ -1,9 +1,9 @@
 import { FaRunning, FaBicycle, FaSwimmer } from 'react-icons/fa';
 
 export const SPORTS = {
-    run: { key: 'run', label: 'Run', verb: 'run', icon: FaRunning },
-    cycle: { key: 'cycle', label: 'Cycle', verb: 'cycle', icon: FaBicycle },
-    swim: { key: 'swim', label: 'Swim', verb: 'swim', icon: FaSwimmer },
+    run: { key: 'run', label: 'Run', verb: 'run', gerund: 'Running', icon: FaRunning },
+    cycle: { key: 'cycle', label: 'Cycle', verb: 'cycle', gerund: 'Cycling', icon: FaBicycle },
+    swim: { key: 'swim', label: 'Swim', verb: 'swim', gerund: 'Swimming', icon: FaSwimmer },
 };
 
 export const SPORT_KEYS = ['run', 'cycle', 'swim'];
