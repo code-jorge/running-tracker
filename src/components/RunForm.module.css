@@ -14,3 +14,43 @@
 .flexButton {
     flex: 1;
 }
+
+.typeSelector {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+}
+
+.typeButton {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px 10px;
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-bg);
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.typeButton svg {
+    font-size: 1.6rem;
+}
+
+.typeButton:hover {
+    color: var(--text-color);
+    border-color: var(--primary);
+}
+
+.typeButtonActive {
+    background: var(--gradient-primary);
+    border-color: transparent;
+    color: var(--text-color);
+    box-shadow: 0 0 0 2px var(--primary-glow);
+}

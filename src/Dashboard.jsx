@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { format, addMonths, subMonths, startOfMonth, getDaysInMonth, getDate, isSameMonth, isBefore, parse } from 'date-fns';
+import { format, addMonths, subMonths, startOfMonth, getDaysInMonth, getDate, isSameMonth, isBefore } from 'date-fns';
 import { FaPlus, FaCog, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import Card from './components/Card';
 import Button from './components/Button';
@@ -9,19 +9,19 @@ import RunForm from './components/RunForm';
 import GoalForm from './components/GoalForm';
 import Modal from './components/Modal';
 import { getDashboardData, saveDashboardData } from './api';
+import { SPORTS, SPORT_KEYS, normalizeGoal, normalizeRun, validSportKey } from './sports';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
-    const [view, setView] = useState('dashboard'); // dashboard, add-run, set-goal, edit-run
-    const [data, setData] = useState({ goal: 0, runs: [] });
+    const [view, setView] = useState('dashboard');
+    const [data, setData] = useState({ goal: normalizeGoal(0), runs: [] });
     const [loading, setLoading] = useState(true);
     const [selectedRun, setSelectedRun] = useState(null);
 
-    // State for currently selected month
     const [selectedDate, setSelectedDate] = useState(new Date());
 
     const currentMonthStr = format(selectedDate, 'yyyy-MM');
-    const monthKey = format(selectedDate, 'MM-yyyy'); // Key for backend
+    const monthKey = format(selectedDate, 'MM-yyyy');
     const monthName = format(selectedDate, 'MMMM yyyy');
     const isCurrentActualMonth = isSameMonth(selectedDate, new Date());
 
@@ -29,7 +29,10 @@ const Dashboard = () => {
         setLoading(true);
         const json = await getDashboardData(currentMonthStr);
         if (json) {
-            setData(json);
+            setData({
+                goal: normalizeGoal(json.goal),
+                runs: (json.runs || []).map(normalizeRun),
+            });
         }
         setLoading(false);
     };
@@ -41,28 +44,23 @@ const Dashboard = () => {
     const handlePrevMonth = () => setSelectedDate(prev => subMonths(prev, 1));
     const handleNextMonth = () => setSelectedDate(prev => addMonths(prev, 1));
 
-    // --- State Handlers ---
-
     const handleGoalSave = async (newGoal) => {
-        const newData = { ...data, goal: parseFloat(newGoal) };
-        setData(newData); // Optimistic update
+        const newData = { ...data, goal: normalizeGoal(newGoal) };
+        setData(newData);
         await saveDashboardData(monthKey, newData);
         setView('dashboard');
     };
 
     const handleRunSave = async (runData) => {
-        // runData: { id?, date, km }
-        // Note: UI restricts date to current month, so we don't need to handle cross-month moves anymore.
-
         let newRuns = [...data.runs];
         const existingIndex = newRuns.findIndex(r => r.id === runData.id);
 
         const processedRun = {
-            id: runData.id || `run-${Date.now()}`, // Ensure ID
+            id: runData.id || `run-${Date.now()}`,
             date: runData.date,
-            km: parseFloat(runData.km), // Ensure number
-            type: 'run',
-            timestamp: runData.timestamp || Date.now()
+            km: parseFloat(runData.km),
+            type: validSportKey(runData.type),
+            timestamp: runData.timestamp || Date.now(),
         };
 
         if (existingIndex >= 0) {
@@ -72,7 +70,7 @@ const Dashboard = () => {
         }
 
         const newData = { ...data, runs: newRuns };
-        setData(newData); // Optimistic update
+        setData(newData);
         await saveDashboardData(monthKey, newData);
 
         setView('dashboard');
@@ -88,32 +86,76 @@ const Dashboard = () => {
         setSelectedRun(null);
     };
 
+    // --- Computed values ---
 
-    // --- Render Helpers ---
+    const totals = SPORT_KEYS.reduce((acc, key) => {
+        acc[key] = data.runs
+            .filter(r => r.type === key)
+            .reduce((sum, r) => sum + (parseFloat(r.km) || 0), 0);
+        return acc;
+    }, {});
 
-    const totalKm = data.runs.reduce((acc, run) => acc + (parseFloat(run.km) || 0), 0);
-    const progressPercent = data.goal > 0 ? (totalKm / data.goal) * 100 : 0;
-    const remaining = Math.max((data.goal || 0) - totalKm, 0);
+    const activeSports = SPORT_KEYS.filter(k => (data.goal[k] || 0) > 0);
+    const hasAnyGoal = activeSports.length > 0;
 
-    // Pacing Logic ... (Same as before)
     let expectedProgress = 0;
-    if (data.goal > 0) {
+    if (hasAnyGoal) {
         if (isCurrentActualMonth) {
             const daysInMonth = getDaysInMonth(selectedDate);
             const dayOfMonth = getDate(new Date());
             expectedProgress = (dayOfMonth / daysInMonth) * 100;
         } else if (isBefore(selectedDate, startOfMonth(new Date()))) {
             expectedProgress = 100;
-        } else {
-            expectedProgress = 0;
         }
     }
 
-    if (loading && !data.goal && data.runs.length === 0) {
+    if (loading && !hasAnyGoal && data.runs.length === 0) {
         return <div className={styles.loading}>Loading...</div>;
     }
 
-    const isAhead = totalKm >= data.goal || totalKm >= (expectedProgress / 100 * data.goal);
+    const renderSportProgress = (key) => {
+        const sport = SPORTS[key];
+        const Icon = sport.icon;
+        const goal = data.goal[key] || 0;
+        const total = totals[key] || 0;
+        const percent = goal > 0 ? (total / goal) * 100 : 0;
+        const expectedKm = (expectedProgress / 100) * goal;
+        const isAhead = total >= goal || total >= expectedKm;
+
+        return (
+            <div key={key} className={styles.sportSection}>
+                <div className={styles.percentageWrapper}>
+                    <Icon className={styles.percentageIcon} aria-label={sport.label} />
+                    <span className={styles.percentageText}>
+                        {Math.round(percent)}%
+                    </span>
+                </div>
+
+                <ProgressBar progress={percent} expected={expectedProgress} goal={goal} />
+
+                <div className={styles.statsBox}>
+                    <div className={styles.statsLeft}>
+                        <div className={styles.label}>Progress</div>
+                        <div className={styles.value}>
+                            {total.toFixed(1)} <span className={styles.subValue}>/ {goal} km</span>
+                        </div>
+                    </div>
+                    <div className={styles.statsRight}>
+                        <div className={styles.label}>Status</div>
+                        <div className={`${styles.statusValue} ${isAhead ? styles.statusGreen : styles.statusYellow}`}>
+                            {total >= goal ? (
+                                <span>Goal completed!</span>
+                            ) : total >= expectedKm ? (
+                                <span>+{(total - expectedKm).toFixed(1)} km ahead</span>
+                            ) : (
+                                <span>{(expectedKm - total).toFixed(1)} km behind</span>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
     return (
         <div className={styles.wrapper}>
@@ -125,40 +167,12 @@ const Dashboard = () => {
                 <Button variant="secondary" onClick={handleNextMonth} className={styles.navButton}><FaChevronRight /></Button>
             </header>
 
-            {/* Dashboard Content - Always Visible */}
             <div className={styles.content}>
 
                 <Card className={styles.progressCard}>
-                    {data.goal > 0 ? (
+                    {hasAnyGoal ? (
                         <div className={styles.percentageContainer}>
-                            <div className={styles.percentageWrapper}>
-                                <span className={styles.percentageText}>
-                                    {Math.round(progressPercent)}%
-                                </span>
-                            </div>
-
-                            <ProgressBar progress={progressPercent} expected={expectedProgress} goal={data.goal} />
-
-                            <div className={styles.statsBox}>
-                                <div className={styles.statsLeft}>
-                                    <div className={styles.label}>Progress</div>
-                                    <div className={styles.value}>
-                                        {totalKm.toFixed(1)} <span className={styles.subValue}>/ {data.goal} km</span>
-                                    </div>
-                                </div>
-                                <div className={styles.statsRight}>
-                                    <div className={styles.label}>Status</div>
-                                    <div className={`${styles.statusValue} ${isAhead ? styles.statusGreen : styles.statusYellow}`}>
-                                        {totalKm >= data.goal ? (
-                                            <span>Goal completed!</span>
-                                        ) : totalKm >= (expectedProgress / 100 * data.goal) ? (
-                                            <span>+{((totalKm - (expectedProgress / 100 * data.goal))).toFixed(1)} km ahead</span>
-                                        ) : (
-                                            <span>{((expectedProgress / 100 * data.goal) - totalKm).toFixed(1)} km behind</span>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
+                            {activeSports.map(renderSportProgress)}
                         </div>
                     ) : (
                         <div className={styles.emptyState}>
@@ -168,16 +182,15 @@ const Dashboard = () => {
                     )}
                 </Card>
 
-                {data.goal > 0 && (
+                {hasAnyGoal && (
                     <>
                         <div className={styles.runListContainer}>
                             <RunList runs={data.runs} onRunClick={(run) => { setSelectedRun(run); setView('edit-run'); }} />
                         </div>
 
-                        {/* Bottom Action Area */}
                         <div className={styles.bottomActions}>
                             <Button variant="primary" onClick={() => { setSelectedRun(null); setView('add-run'); }}>
-                                <FaPlus /> Log Run
+                                <FaPlus /> Log Activity
                             </Button>
                             <Button variant="secondary" onClick={() => setView('set-goal')}>
                                 <FaCog /> Goal Settings
@@ -187,7 +200,6 @@ const Dashboard = () => {
                 )}
             </div>
 
-            {/* Modal Overlay */}
             <Modal
                 isOpen={view === 'add-run' || view === 'set-goal' || view === 'edit-run'}
                 onClose={() => {

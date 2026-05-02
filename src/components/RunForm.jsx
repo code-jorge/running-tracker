@@ -3,19 +3,16 @@ import { format, parse, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
 import Card from './Card';
 import Input from './Input';
 import Button from './Button';
-import { FaRunning } from 'react-icons/fa';
+import { SPORTS, SPORT_KEYS, validSportKey } from '../sports';
 import styles from './RunForm.module.css';
 
 const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
-    // Parse current month limits
     const monthDate = parse(currentMonth, 'yyyy-MM', new Date());
     const minDate = format(startOfMonth(monthDate), 'yyyy-MM-dd');
     const maxDate = format(endOfMonth(monthDate), 'yyyy-MM-dd');
 
-    // Determine initial date
     const getInitialDate = () => {
         if (initialData) return initialData.date;
-
         const today = new Date();
         if (isSameMonth(today, monthDate)) {
             return format(today, 'yyyy-MM-dd');
@@ -23,6 +20,7 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
         return minDate;
     };
 
+    const [type, setType] = useState(validSportKey(initialData?.type));
     const [date, setDate] = useState(getInitialDate());
     const [km, setKm] = useState('');
     const [loading, setLoading] = useState(false);
@@ -31,29 +29,31 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
         if (initialData) {
             setKm(initialData.km);
             setDate(initialData.date);
+            setType(validSportKey(initialData.type));
         } else {
             setKm('');
             setDate(getInitialDate());
+            setType('run');
         }
     }, [initialData, currentMonth]);
 
     const isEditing = !!initialData;
+    const ActiveIcon = SPORTS[type].icon;
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-
         await onSave({
             id: initialData?.id,
             date,
-            km
+            km,
+            type,
         });
-
         setLoading(false);
     };
 
     const handleDelete = async () => {
-        if (confirm('Are you sure you want to delete this run?')) {
+        if (confirm(`Are you sure you want to delete this ${SPORTS[type].verb}?`)) {
             onDelete(initialData.id);
         }
     };
@@ -61,9 +61,30 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
     return (
         <Card>
             <h3 className={styles.header}>
-                <FaRunning className={styles.headerIcon} /> {isEditing ? 'Edit Run' : 'Log Run'}
+                <ActiveIcon className={styles.headerIcon} /> {isEditing ? `Edit ${SPORTS[type].label}` : `Log ${SPORTS[type].label}`}
             </h3>
             <form onSubmit={handleSubmit}>
+                <div className={styles.typeSelector} role="radiogroup" aria-label="Activity type">
+                    {SPORT_KEYS.map((key) => {
+                        const sport = SPORTS[key];
+                        const Icon = sport.icon;
+                        const selected = type === key;
+                        return (
+                            <button
+                                key={key}
+                                type="button"
+                                role="radio"
+                                aria-checked={selected}
+                                aria-label={sport.label}
+                                onClick={() => setType(key)}
+                                className={`${styles.typeButton} ${selected ? styles.typeButtonActive : ''}`}
+                            >
+                                <Icon />
+                                <span>{sport.label}</span>
+                            </button>
+                        );
+                    })}
+                </div>
                 <Input
                     type="date"
                     label="Date"

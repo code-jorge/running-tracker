@@ -4,14 +4,18 @@ import Card from './Card';
 import Input from './Input';
 import Button from './Button';
 import { FaTrophy } from 'react-icons/fa';
+import { SPORTS, SPORT_KEYS, normalizeGoal } from '../sports';
 import styles from './GoalForm.module.css';
 
 const GoalForm = ({ currentMonth, onSave, onCancel, initialGoal = 0 }) => {
-    const [target, setTarget] = useState(initialGoal > 0 ? initialGoal : '');
+    const initial = normalizeGoal(initialGoal);
+    const [targets, setTargets] = useState({
+        run: initial.run > 0 ? String(initial.run) : '',
+        cycle: initial.cycle > 0 ? String(initial.cycle) : '',
+    });
     const [loading, setLoading] = useState(false);
-    const isEditing = initialGoal > 0;
+    const isEditing = initial.run > 0 || initial.cycle > 0;
 
-    // Format display date
     let formattedDate = currentMonth;
     try {
         const dateObj = parse(currentMonth, 'yyyy-MM', new Date());
@@ -23,9 +27,15 @@ const GoalForm = ({ currentMonth, onSave, onCancel, initialGoal = 0 }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        await onSave(target);
+        await onSave({
+            run: parseFloat(targets.run) || 0,
+            cycle: parseFloat(targets.cycle) || 0,
+        });
         setLoading(false);
     };
+
+    const hasAnyTarget =
+        (parseFloat(targets.run) || 0) > 0 || (parseFloat(targets.cycle) || 0) > 0;
 
     return (
         <Card>
@@ -34,22 +44,34 @@ const GoalForm = ({ currentMonth, onSave, onCancel, initialGoal = 0 }) => {
             </h3>
             <p className={styles.description}>
                 {isEditing
-                    ? `Update your target distance for ${formattedDate}.`
-                    : `Challenge yourself! How many km do you want to run in ${formattedDate}?`
+                    ? `Update your targets for ${formattedDate}.`
+                    : `Challenge yourself! Set how many km you want for ${formattedDate}. Leave a sport at 0 to skip it.`
                 }
             </p>
             <form onSubmit={handleSubmit}>
-                <Input
-                    type="number"
-                    label="Target Distance (km)"
-                    value={target}
-                    onChange={(e) => setTarget(e.target.value)}
-                    placeholder="e.g. 100"
-                    required
-                />
+                {SPORT_KEYS.map((key) => {
+                    const sport = SPORTS[key];
+                    const Icon = sport.icon;
+                    return (
+                        <Input
+                            key={key}
+                            type="number"
+                            step="0.1"
+                            min="0"
+                            label={
+                                <span className={styles.sportLabel}>
+                                    <Icon /> {sport.label} target (km)
+                                </span>
+                            }
+                            value={targets[key]}
+                            onChange={(e) => setTargets((t) => ({ ...t, [key]: e.target.value }))}
+                            placeholder="e.g. 100"
+                        />
+                    );
+                })}
                 <div className={styles.buttons}>
                     {onCancel && <Button type="button" variant="secondary" onClick={onCancel}>Cancel</Button>}
-                    <Button type="submit" variant="primary" disabled={loading}>
+                    <Button type="submit" variant="primary" disabled={loading || !hasAnyTarget}>
                         {loading ? 'Saving...' : (isEditing ? 'Update Goal' : 'Set Goal')}
                     </Button>
                 </div>
