@@ -22,15 +22,6 @@ const ProgressBar = ({ progress, expected, goal }) => (
                 <span>0 km</span>
                 <span>{goal} km</span>
             </div>
-
-            {expected > 0 && expected < 100 && (
-                <div
-                    className={styles.pacingLabel}
-                    style={{ '--pacing-left': `${expected}%` }}
-                >
-                    <span>▲</span>
-                </div>
-            )}
         </div>
     </div>
 );

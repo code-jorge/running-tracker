@@ -57,12 +57,7 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-
-.sportRow {
-    width: 100%;
-    text-align: center;
+    gap: 16px;
 }
 
 .percentageText {
@@ -73,7 +68,6 @@
 }
 
 .percentageWrapper {
-    margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -118,12 +112,17 @@
 
 .statsBox {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 20px;
+    flex-direction: column;
+    gap: 12px;
     padding: 15px;
     background: var(--surface-dim);
     border-radius: 12px;
+}
+
+.statsHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .statsLeft {

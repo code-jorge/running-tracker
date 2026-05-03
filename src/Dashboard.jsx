@@ -153,9 +153,8 @@ const Dashboard = () => {
         const { goal, total, percent, expectedKm } = sportStats(key);
         const isAhead = total >= goal || total >= expectedKm;
         return (
-            <div key={key} className={styles.sportRow}>
-                <ProgressBar progress={percent} expected={expectedProgress} goal={goal} />
-                <div className={styles.statsBox}>
+            <div key={key} className={styles.statsBox}>
+                <div className={styles.statsHeader}>
                     <div className={styles.statsLeft}>
                         <div className={styles.label}>{sport.gerund} progress</div>
                         <div className={styles.value}>
@@ -175,6 +174,9 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
+                {activeSports.length === 1 && (
+                    <ProgressBar progress={percent} expected={expectedProgress} goal={goal} />
+                )}
             </div>
         );
     };
