@@ -174,9 +174,7 @@ const Dashboard = () => {
                         </div>
                     </div>
                 </div>
-                {activeSports.length === 1 && (
-                    <ProgressBar progress={percent} expected={expectedProgress} goal={goal} />
-                )}
+                <ProgressBar progress={percent} expected={expectedProgress} goal={goal} />
             </div>
         );
     };
