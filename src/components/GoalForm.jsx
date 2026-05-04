@@ -9,12 +9,14 @@ import styles from './GoalForm.module.css';
 
 const GoalForm = ({ currentMonth, onSave, onCancel, initialGoal = 0 }) => {
     const initial = normalizeGoal(initialGoal);
-    const [targets, setTargets] = useState({
-        run: initial.run > 0 ? String(initial.run) : '',
-        cycle: initial.cycle > 0 ? String(initial.cycle) : '',
-    });
+    const [targets, setTargets] = useState(
+        SPORT_KEYS.reduce(
+            (acc, key) => ({ ...acc, [key]: initial[key] > 0 ? String(initial[key]) : '' }),
+            {}
+        )
+    );
     const [loading, setLoading] = useState(false);
-    const isEditing = initial.run > 0 || initial.cycle > 0;
+    const isEditing = SPORT_KEYS.some((key) => initial[key] > 0);
 
     let formattedDate = currentMonth;
     try {
@@ -27,15 +29,16 @@ const GoalForm = ({ currentMonth, onSave, onCancel, initialGoal = 0 }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        await onSave({
-            run: parseFloat(targets.run) || 0,
-            cycle: parseFloat(targets.cycle) || 0,
-        });
+        await onSave(
+            SPORT_KEYS.reduce(
+                (acc, key) => ({ ...acc, [key]: parseFloat(targets[key]) || 0 }),
+                {}
+            )
+        );
         setLoading(false);
     };
 
-    const hasAnyTarget =
-        (parseFloat(targets.run) || 0) > 0 || (parseFloat(targets.cycle) || 0) > 0;
+    const hasAnyTarget = SPORT_KEYS.some((key) => (parseFloat(targets[key]) || 0) > 0);
 
     return (
         <Card>
