@@ -85,6 +85,11 @@
     width: 100%;
 }
 
+.percentageGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+}
+
 .percentageBox {
     flex: 1;
     display: flex;

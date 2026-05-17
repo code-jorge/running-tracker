@@ -218,7 +218,7 @@ const Dashboard = () => {
                             {activeSports.length === 1 && gymDays === 0 ? (
                                 activeSports.map(renderSportHeader)
                             ) : (
-                                <div className={styles.percentageRow}>
+                                <div className={`${styles.percentageRow} ${activeSports.length + (gymDays > 0 ? 1 : 0) >= 4 ? styles.percentageGrid : ''}`}>
                                     {activeSports.map(renderSportBox)}
                                     {gymDays > 0 && renderGymBox()}
                                 </div>
