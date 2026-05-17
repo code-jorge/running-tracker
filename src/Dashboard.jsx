@@ -205,14 +205,8 @@ const Dashboard = () => {
 
             <div className={styles.content}>
 
-                <div className={styles.gymChip} aria-label="Gym visits this month">
-                    <FaDumbbell className={styles.gymChipIcon} />
-                    <span className={styles.gymChipCount}>{gymDays}</span>
-                    <span className={styles.gymChipLabel}>{gymDays === 1 ? 'day' : 'days'}</span>
-                </div>
-
-                {hasAnyGoal ? (
-                    <Card className={styles.progressCard}>
+                <Card className={styles.progressCard}>
+                    {hasAnyGoal ? (
                         <div className={styles.percentageContainer}>
                             {activeSports.length > 1 ? (
                                 <div className={styles.percentageRow}>
@@ -223,15 +217,18 @@ const Dashboard = () => {
                             )}
                             {activeSports.map(renderSportRow)}
                         </div>
-                    </Card>
-                ) : (
-                    <Card className={styles.progressCard}>
+                    ) : (
                         <div className={styles.emptyState}>
                             <p className={styles.emptyStateText}>No goal set for this month.</p>
                             <Button variant="primary" onClick={() => setView('set-goal')}>Set Goal</Button>
                         </div>
-                    </Card>
-                )}
+                    )}
+                    <div className={styles.gymChip} aria-label="Gym visits this month">
+                        <FaDumbbell className={styles.gymChipIcon} />
+                        <span className={styles.gymChipCount}>{gymDays}</span>
+                        <span className={styles.gymChipLabel}>{gymDays === 1 ? 'day' : 'days'}</span>
+                    </div>
+                </Card>
 
                 <div className={styles.runListContainer}>
                     <RunList runs={data.runs} onRunClick={(run) => { setSelectedRun(run); setView('edit-run'); }} />

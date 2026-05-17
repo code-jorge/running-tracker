@@ -1,6 +1,6 @@
 import Card from './Card';
 import { format } from 'date-fns';
-import { FaListUl } from 'react-icons/fa';
+import { FaListUl, FaCheckSquare } from 'react-icons/fa';
 import { SPORTS, validActivityKey, isDistanceActivity } from '../sports';
 import styles from './RunList.module.css';
 
@@ -46,7 +46,7 @@ const RunList = ({ runs, onRunClick }) => {
                                         {run.km} <span className={styles.unit}>km</span>
                                     </div>
                                 ) : (
-                                    <div className={styles.activityLabel}>{sport.gerund}</div>
+                                    <FaCheckSquare className={styles.checkbox} aria-label="Visited" />
                                 )}
                             </div>
                         );

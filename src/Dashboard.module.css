@@ -45,15 +45,14 @@
 }
 
 .gymChip {
-    align-self: flex-start;
+    align-self: center;
     display: inline-flex;
     align-items: center;
     gap: 8px;
+    margin-top: 16px;
     padding: 8px 14px;
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border, var(--border-medium));
+    background: var(--surface-dim);
     border-radius: 999px;
-    backdrop-filter: blur(10px);
 }
 
 .gymChipIcon {

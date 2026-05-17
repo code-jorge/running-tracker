@@ -73,8 +73,7 @@
     color: var(--text-muted);
 }
 
-.activityLabel {
-    font-weight: 600;
-    font-size: 1rem;
+.checkbox {
+    font-size: 1.6rem;
     color: var(--accent);
 }
