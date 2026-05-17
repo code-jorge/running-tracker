@@ -162,6 +162,13 @@ const Dashboard = () => {
         );
     };
 
+    const renderGymBox = () => (
+        <div key="gym" className={styles.percentageBox}>
+            <FaDumbbell className={styles.boxIcon} aria-label="Gym" />
+            <span className={styles.boxPercent}>{gymDays}d</span>
+        </div>
+    );
+
     const renderSportRow = (key) => {
         const sport = SPORTS[key];
         const { goal, total, percent, expectedKm } = sportStats(key);
@@ -206,28 +213,25 @@ const Dashboard = () => {
             <div className={styles.content}>
 
                 <Card className={styles.progressCard}>
-                    {hasAnyGoal ? (
+                    {(hasAnyGoal || gymDays > 0) && (
                         <div className={styles.percentageContainer}>
-                            {activeSports.length > 1 ? (
+                            {activeSports.length === 1 && gymDays === 0 ? (
+                                activeSports.map(renderSportHeader)
+                            ) : (
                                 <div className={styles.percentageRow}>
                                     {activeSports.map(renderSportBox)}
+                                    {gymDays > 0 && renderGymBox()}
                                 </div>
-                            ) : (
-                                activeSports.map(renderSportHeader)
                             )}
                             {activeSports.map(renderSportRow)}
                         </div>
-                    ) : (
+                    )}
+                    {!hasAnyGoal && (
                         <div className={styles.emptyState}>
                             <p className={styles.emptyStateText}>No goal set for this month.</p>
                             <Button variant="primary" onClick={() => setView('set-goal')}>Set Goal</Button>
                         </div>
                     )}
-                    <div className={styles.gymChip} aria-label="Gym visits this month">
-                        <FaDumbbell className={styles.gymChipIcon} />
-                        <span className={styles.gymChipCount}>{gymDays}</span>
-                        <span className={styles.gymChipLabel}>{gymDays === 1 ? 'day' : 'days'}</span>
-                    </div>
                 </Card>
 
                 <div className={styles.runListContainer}>

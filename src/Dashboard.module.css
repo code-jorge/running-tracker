@@ -44,34 +44,6 @@
     gap: 20px;
 }
 
-.gymChip {
-    align-self: center;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    margin-top: 16px;
-    padding: 8px 14px;
-    background: var(--surface-dim);
-    border-radius: 999px;
-}
-
-.gymChipIcon {
-    font-size: 1.2rem;
-    color: var(--accent);
-}
-
-.gymChipCount {
-    font-size: 1.1rem;
-    font-weight: 800;
-    color: var(--accent);
-    line-height: 1;
-}
-
-.gymChipLabel {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
 .progressCard {
     display: flex;
     flex-direction: column;
