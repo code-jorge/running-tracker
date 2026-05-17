@@ -1,7 +1,7 @@
 import Card from './Card';
 import { format } from 'date-fns';
 import { FaListUl } from 'react-icons/fa';
-import { SPORTS, validSportKey } from '../sports';
+import { SPORTS, validActivityKey, isDistanceActivity } from '../sports';
 import styles from './RunList.module.css';
 
 const RunList = ({ runs, onRunClick }) => {
@@ -20,8 +20,10 @@ const RunList = ({ runs, onRunClick }) => {
             ) : (
                 <div className={styles.list}>
                     {sortedRuns.map((run) => {
-                        const sport = SPORTS[validSportKey(run.type)];
+                        const type = validActivityKey(run.type);
+                        const sport = SPORTS[type];
                         const Icon = sport.icon;
+                        const hasDistance = isDistanceActivity(type);
                         return (
                             <div
                                 key={run.id}
@@ -39,9 +41,13 @@ const RunList = ({ runs, onRunClick }) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className={styles.distance}>
-                                    {run.km} <span className={styles.unit}>km</span>
-                                </div>
+                                {hasDistance ? (
+                                    <div className={styles.distance}>
+                                        {run.km} <span className={styles.unit}>km</span>
+                                    </div>
+                                ) : (
+                                    <div className={styles.activityLabel}>{sport.gerund}</div>
+                                )}
                             </div>
                         );
                     })}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, addMonths, subMonths, startOfMonth, getDaysInMonth, getDate, isSameMonth, isBefore } from 'date-fns';
-import { FaPlus, FaCog, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
+import { FaPlus, FaCog, FaChevronLeft, FaChevronRight, FaDumbbell } from 'react-icons/fa';
 import Card from './components/Card';
 import Button from './components/Button';
 import ProgressBar from './components/ProgressBar';
@@ -9,7 +9,7 @@ import RunForm from './components/RunForm';
 import GoalForm from './components/GoalForm';
 import Modal from './components/Modal';
 import { getDashboardData, saveDashboardData } from './api';
-import { SPORTS, SPORT_KEYS, normalizeGoal, normalizeRun, validSportKey } from './sports';
+import { SPORTS, SPORT_KEYS, normalizeGoal, normalizeRun, validActivityKey } from './sports';
 import styles from './Dashboard.module.css';
 
 const Dashboard = () => {
@@ -52,14 +52,24 @@ const Dashboard = () => {
     };
 
     const handleRunSave = async (runData) => {
+        const type = validActivityKey(runData.type);
         let newRuns = [...data.runs];
         const existingIndex = newRuns.findIndex(r => r.id === runData.id);
+
+        if (type === 'gym' && existingIndex < 0) {
+            const duplicate = newRuns.some(r => r.type === 'gym' && r.date === runData.date);
+            if (duplicate) {
+                setView('dashboard');
+                setSelectedRun(null);
+                return;
+            }
+        }
 
         const processedRun = {
             id: runData.id || `run-${Date.now()}`,
             date: runData.date,
-            km: parseFloat(runData.km),
-            type: validSportKey(runData.type),
+            km: type === 'gym' ? 0 : parseFloat(runData.km),
+            type,
             timestamp: runData.timestamp || Date.now(),
         };
 
@@ -94,6 +104,10 @@ const Dashboard = () => {
             .reduce((sum, r) => sum + (parseFloat(r.km) || 0), 0);
         return acc;
     }, {});
+
+    const gymDays = new Set(
+        data.runs.filter(r => r.type === 'gym').map(r => r.date)
+    ).size;
 
     const activeSports = SPORT_KEYS.filter(k => (data.goal[k] || 0) > 0);
     const hasAnyGoal = activeSports.length > 0;
@@ -191,8 +205,14 @@ const Dashboard = () => {
 
             <div className={styles.content}>
 
-                <Card className={styles.progressCard}>
-                    {hasAnyGoal ? (
+                <div className={styles.gymChip} aria-label="Gym visits this month">
+                    <FaDumbbell className={styles.gymChipIcon} />
+                    <span className={styles.gymChipCount}>{gymDays}</span>
+                    <span className={styles.gymChipLabel}>{gymDays === 1 ? 'day' : 'days'}</span>
+                </div>
+
+                {hasAnyGoal ? (
+                    <Card className={styles.progressCard}>
                         <div className={styles.percentageContainer}>
                             {activeSports.length > 1 ? (
                                 <div className={styles.percentageRow}>
@@ -203,30 +223,28 @@ const Dashboard = () => {
                             )}
                             {activeSports.map(renderSportRow)}
                         </div>
-                    ) : (
+                    </Card>
+                ) : (
+                    <Card className={styles.progressCard}>
                         <div className={styles.emptyState}>
                             <p className={styles.emptyStateText}>No goal set for this month.</p>
                             <Button variant="primary" onClick={() => setView('set-goal')}>Set Goal</Button>
                         </div>
-                    )}
-                </Card>
-
-                {hasAnyGoal && (
-                    <>
-                        <div className={styles.runListContainer}>
-                            <RunList runs={data.runs} onRunClick={(run) => { setSelectedRun(run); setView('edit-run'); }} />
-                        </div>
-
-                        <div className={styles.bottomActions}>
-                            <Button variant="primary" onClick={() => { setSelectedRun(null); setView('add-run'); }}>
-                                <FaPlus /> Log Activity
-                            </Button>
-                            <Button variant="secondary" onClick={() => setView('set-goal')}>
-                                <FaCog /> Goal Settings
-                            </Button>
-                        </div>
-                    </>
+                    </Card>
                 )}
+
+                <div className={styles.runListContainer}>
+                    <RunList runs={data.runs} onRunClick={(run) => { setSelectedRun(run); setView('edit-run'); }} />
+                </div>
+
+                <div className={styles.bottomActions}>
+                    <Button variant="primary" onClick={() => { setSelectedRun(null); setView('add-run'); }}>
+                        <FaPlus /> Log Activity
+                    </Button>
+                    <Button variant="secondary" onClick={() => setView('set-goal')}>
+                        <FaCog /> Goal Settings
+                    </Button>
+                </div>
             </div>
 
             <Modal

@@ -3,7 +3,7 @@ import { format, parse, startOfMonth, endOfMonth, isSameMonth } from 'date-fns';
 import Card from './Card';
 import Input from './Input';
 import Button from './Button';
-import { SPORTS, SPORT_KEYS, validSportKey } from '../sports';
+import { SPORTS, ACTIVITY_KEYS, validActivityKey, isDistanceActivity } from '../sports';
 import styles from './RunForm.module.css';
 
 const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
@@ -20,16 +20,16 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
         return minDate;
     };
 
-    const [type, setType] = useState(validSportKey(initialData?.type));
+    const [type, setType] = useState(validActivityKey(initialData?.type));
     const [date, setDate] = useState(getInitialDate());
     const [km, setKm] = useState('');
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (initialData) {
-            setKm(initialData.km);
+            setKm(initialData.km ?? '');
             setDate(initialData.date);
-            setType(validSportKey(initialData.type));
+            setType(validActivityKey(initialData.type));
         } else {
             setKm('');
             setDate(getInitialDate());
@@ -39,6 +39,7 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
 
     const isEditing = !!initialData;
     const ActiveIcon = SPORTS[type].icon;
+    const needsDistance = isDistanceActivity(type);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -46,7 +47,7 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
         await onSave({
             id: initialData?.id,
             date,
-            km,
+            km: needsDistance ? km : 0,
             type,
         });
         setLoading(false);
@@ -65,7 +66,7 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
             </h3>
             <form onSubmit={handleSubmit}>
                 <div className={styles.typeSelector} role="radiogroup" aria-label="Activity type">
-                    {SPORT_KEYS.map((key) => {
+                    {ACTIVITY_KEYS.map((key) => {
                         const sport = SPORTS[key];
                         const Icon = sport.icon;
                         const selected = type === key;
@@ -94,15 +95,17 @@ const RunForm = ({ onSave, onDelete, onCancel, initialData, currentMonth }) => {
                     onChange={(e) => setDate(e.target.value)}
                     required
                 />
-                <Input
-                    type="number"
-                    step="0.01"
-                    label="Distance (km)"
-                    value={km}
-                    onChange={(e) => setKm(e.target.value)}
-                    placeholder="e.g. 5.2"
-                    required
-                />
+                {needsDistance && (
+                    <Input
+                        type="number"
+                        step="0.01"
+                        label="Distance (km)"
+                        value={km}
+                        onChange={(e) => setKm(e.target.value)}
+                        placeholder="e.g. 5.2"
+                        required
+                    />
+                )}
                 <div className={styles.buttons}>
 
                     {isEditing && (
